@@ -1,4 +1,4 @@
-import google.generativeai as genai
+import google.generativeai as gemini
 import pyttsx3
 import speech_recognition as sr
 import tkinter as tk
@@ -43,7 +43,7 @@ def main():
 
             Fala.insert('1.0', texto.replace(('*'), ('\n')))
 
-            resposta = chat.send_message(texto.replace('*', '\n').replace('\n\n', '\n').replace('\n\n\n', '\n\n'))
+            resposta = chat.send_message(texto)
             resposta = resposta.text.replace('*', '\n').replace('\n\n', '\n').replace('\n\n\n', '\n\n')
 
             Resposta.insert('1.0', resposta)
@@ -135,7 +135,7 @@ def enviar_texto():
     except: pass
     Resposta.delete('1.0', 'end')
     texto = Fala.get('1.0', 'end-1c')
-    resposta = chat.send_message(texto.replace('*', '\n').replace('\n\n', '\n').replace('\n\n\n', '\n\n'))
+    resposta = chat.send_message(texto)
     resposta = resposta.text.replace('*', '\n').replace('\n\n', '\n').replace('\n\n\n', '\n\n')
     numero += 1
     historico.append({numero: [texto, resposta]})
@@ -266,9 +266,9 @@ numero = 0
 historico = []
 
 x = ''
-genai.configure(api_key="")
+gemini.configure(api_key="")
 
-model = genai.GenerativeModel('gemini-pro')
+model = gemini.GenerativeModel('gemini-pro')
 chat = model.start_chat(history=[])
 
 janela = tk.Tk()
@@ -299,10 +299,10 @@ narrar_seleção = tk.Button(button_frame, text='Narrar seleção', command=narr
 lista = tk.Button(button_frame, text='Histórico', command=historico_buttons, bg='light green', font=('Arial', 14))
 lista.pack(side='left')
 
-Fala = tk.Text(janela, height=2, width=78, font=("Arial", 12), wrap="word")
+Fala = tk.Text(janela, height=2, width=78, font=("Arial", 12), wrap="word", bg='light grey')
 Fala.pack()
 
-Resposta = tk.Text(janela, height=36, width=78, font=("Arial", 12), wrap="word")
+Resposta = tk.Text(janela, height=36, width=78, font=("Arial", 12), wrap="word", bg='light grey')
 Resposta.pack(pady=6)
 
 def ajuste(evento):
@@ -325,10 +325,10 @@ if historico:
             for item in mensagem:
                 cursor.execute(f'INSERT INTO {str(tabela_antiga)} VALUES (?, ?, ?)', (item, mensagem[item][0], mensagem[item][1]))
 
-    cursor.execute(f'CREATE TABLE {'Conversa' + str(tabelas + 1)} (id INTEGER, fala TEXT, resposta TEXT)')
+    cursor.execute(f'CREATE TABLE Conversa{str(tabelas + 1)} (id INTEGER, fala TEXT, resposta TEXT)')
     for mensagem in historico:
         for item in mensagem:
-            cursor.execute(f'INSERT INTO {'Conversa' + str(tabelas + 1)} VALUES (?, ?, ?)', (item, mensagem[item][0], mensagem[item][1]))
+            cursor.execute(f'INSERT INTO Conversa{str(tabelas + 1)} VALUES (?, ?, ?)', (item, mensagem[item][0], mensagem[item][1]))
 
 banco.commit()
 cursor.close()
